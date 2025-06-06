@@ -205,13 +205,7 @@ defmodule LMStudio do
       {~c"Accept", ~c"application/json"}
     ]
     
-    json_body = try do
-      Jason.encode!(body)
-    rescue
-      UndefinedFunctionError ->
-        # Fallback for testing without Jason - this will trigger connection error
-        "{\"error\": \"JSON encoding not available\"}"
-    end
+    json_body = Jason.encode!(body)
     
     case :httpc.request(
       :post,
@@ -237,13 +231,7 @@ defmodule LMStudio do
       {~c"Accept", ~c"text/event-stream"}
     ]
     
-    json_body = try do
-      Jason.encode!(body)
-    rescue
-      UndefinedFunctionError ->
-        # Fallback for testing without Jason - this will trigger connection error
-        "{\"error\": \"JSON encoding not available\"}"
-    end
+    json_body = Jason.encode!(body)
     parent = self()
     
     # Spawn a process to handle the streaming response

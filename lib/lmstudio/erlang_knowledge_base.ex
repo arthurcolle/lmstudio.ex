@@ -702,9 +702,9 @@ defmodule LMStudio.ErlangKnowledgeBase do
       String.contains?(use_case, "state") ->
         [:gen_server_with_state, :agent_pattern | recommendations]
       String.contains?(use_case, "worker") ->
-        [:task_supervisor_pattern, :worker_pools | recommendations]
+        [:task_supervisor_pattern, :supervisor_one_for_one | recommendations]
       String.contains?(use_case, "event") ->
-        [:gen_event, :pub_sub | recommendations]
+        [:registry_pattern, :gen_server_with_state | recommendations]
       true ->
         recommendations
     end
@@ -712,9 +712,9 @@ defmodule LMStudio.ErlangKnowledgeBase do
     # Scale based recommendations
     recommendations = case scale do
       :large ->
-        [:clustering, :replication, :partitioning | recommendations]
+        [:task_supervisor_pattern, :registry_pattern, :supervisor_one_for_one | recommendations]
       :medium ->
-        [:process_pooling, :ets_usage | recommendations]
+        [:task_supervisor_pattern, :gen_server_with_state | recommendations]
       :small ->
         [:gen_server_with_state, :supervisor_one_for_one | recommendations]
     end
@@ -722,9 +722,9 @@ defmodule LMStudio.ErlangKnowledgeBase do
     # Fault tolerance recommendations
     recommendations = case fault_tolerance do
       :high ->
-        [:let_it_crash, :supervision_trees, :circuit_breaker | recommendations]
+        [:supervisor_one_for_one, :task_supervisor_pattern, :gen_server_with_state | recommendations]
       :medium ->
-        [:supervision_trees, :bulkhead | recommendations]
+        [:supervisor_one_for_one, :gen_server_with_state | recommendations]
       :low ->
         [:supervisor_one_for_one | recommendations]
     end

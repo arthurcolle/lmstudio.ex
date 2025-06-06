@@ -1,4 +1,4 @@
-defmodule Jason do
+defmodule LMStudio.JsonMock do
   @moduledoc """
   Simple JSON mock for testing without external dependencies
   """

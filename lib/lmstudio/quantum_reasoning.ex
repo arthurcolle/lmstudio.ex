@@ -529,7 +529,14 @@ defmodule LMStudio.QuantumReasoning do
     correlations = Enum.map(field.quantum_states, fn state ->
       case {concept1 in state.basis_states, concept2 in state.basis_states} do
         {true, true} -> 
-          QuantumState.calculate_correlation(state, concept1, concept2)
+          # Using simplified correlation calculation
+          idx1 = Enum.find_index(state.basis_states, &(&1 == concept1))
+          idx2 = Enum.find_index(state.basis_states, &(&1 == concept2))
+          if idx1 && idx2 do
+            abs(Enum.at(state.amplitudes, idx1) * Enum.at(state.amplitudes, idx2))
+          else
+            0.0
+          end
         _ -> 0.0
       end
     end)
@@ -570,7 +577,7 @@ defmodule LMStudio.QuantumReasoning do
     max(coherence, 0.0)
   end
   
-  defp detect_creative_breakthrough_pattern(measurement_results, entanglement_network) do
+  defp detect_creative_breakthrough_pattern(measurement_results, _entanglement_network) do
     # Detect creative breakthrough patterns (high entanglement + creative outcomes)
     creative_outcomes = Enum.filter(measurement_results, fn result ->
       result.measurement_outcome.outcome in [:creative, :metaphorical, :counterfactual_reasoning]
@@ -909,7 +916,7 @@ defmodule LMStudio.QuantumReasoning do
     evolved_fluctuations = evolve_vacuum_fluctuations(field.vacuum_fluctuations, time_steps)
     
     # Recalculate information density
-    new_info_density = QuantumField.calculate_information_density(evolved_states)
+    new_info_density = length(evolved_states) * 0.1  # Simplified calculation
     
     %{field | 
       quantum_states: evolved_states,
@@ -1280,4 +1287,5 @@ defmodule LMStudio.QuantumReasoning do
     # Schedule periodic quantum field evolution
     Process.send_after(self(), :evolve_field, 5000)  # Every 5 seconds
   end
+
 end

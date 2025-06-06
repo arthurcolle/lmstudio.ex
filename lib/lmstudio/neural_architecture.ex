@@ -190,8 +190,8 @@ defmodule LMStudio.NeuralArchitecture do
     defp apply_activation(x, _), do: x  # Linear activation
     
     defp activation_derivative(y, :tanh), do: 1.0 - y * y
-    defp activation_derivative(y, :relu), do: if y > 0, do: 1.0, else: 0.0
-    defp activation_derivative(y, :leaky_relu), do: if y > 0, do: 1.0, else: 0.01
+    defp activation_derivative(y, :relu), do: if(y > 0, do: 1.0, else: 0.0)
+    defp activation_derivative(y, :leaky_relu), do: if(y > 0, do: 1.0, else: 0.01)
     defp activation_derivative(y, :sigmoid), do: y * (1.0 - y)
     defp activation_derivative(y, :swish), do: y + apply_activation(y, :sigmoid) * (1.0 - y)
     defp activation_derivative(y, :gelu) do
@@ -252,8 +252,8 @@ defmodule LMStudio.NeuralArchitecture do
     end
     
     def forward(%__MODULE__{} = attention, query, key, value, mask \\ nil) do
-      batch_size = length(query)
-      seq_len = if batch_size > 0, do: length(hd(query)), else: 0
+      _batch_size = length(query)
+      # seq_len = if batch_size > 0, do: length(hd(query)), else: 0
       
       # Linear projections
       queries = matrix_multiply(query, attention.query_weights)
@@ -266,7 +266,8 @@ defmodule LMStudio.NeuralArchitecture do
       values_heads = reshape_for_heads(values, attention.num_heads, attention.head_dim)
       
       # Scaled dot-product attention for each head
-      attention_outputs = Enum.zip3(queries_heads, keys_heads, values_heads)
+      attention_outputs = Enum.zip([queries_heads, keys_heads, values_heads])
+      |> Enum.map(fn list -> List.to_tuple(list) end)
       |> Enum.map(fn {q, k, v} ->
         scaled_dot_product_attention(q, k, v, attention.temperature, mask)
       end)
@@ -307,7 +308,7 @@ defmodule LMStudio.NeuralArchitecture do
       end)
     end
     
-    defp reshape_for_heads(matrix, num_heads, head_dim) do
+    defp reshape_for_heads(matrix, num_heads, _head_dim) do
       # Reshape matrix for multi-head attention
       # This is a simplified version
       chunk_size = max(div(length(hd(matrix)), num_heads), 1)
@@ -588,7 +589,8 @@ defmodule LMStudio.NeuralArchitecture do
         std = :math.sqrt(variance + layer_norm.epsilon)
         
         # Normalize and scale
-        Enum.zip3(row, gamma_row, beta_row)
+        Enum.zip([row, gamma_row, beta_row])
+        |> Enum.map(fn list -> List.to_tuple(list) end)
         |> Enum.map(fn {x, gamma, beta} ->
           normalized = (x - mean) / std
           gamma * normalized + beta
@@ -737,7 +739,7 @@ defmodule LMStudio.NeuralArchitecture do
     def evolve_architecture(%__MODULE__{} = model, evolution_config \\ %{}) do
       # Evolve the neural architecture based on performance
       mutation_rate = Map.get(evolution_config, :mutation_rate, 0.1)
-      selection_pressure = Map.get(evolution_config, :selection_pressure, 0.8)
+      # selection_pressure = Map.get(evolution_config, :selection_pressure, 0.8)
       
       # Analyze current performance
       performance_analysis = analyze_model_performance(model)
