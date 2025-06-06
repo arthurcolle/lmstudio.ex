@@ -16,14 +16,20 @@ defmodule Lmstudio.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :inets, :ssl]
+      extra_applications: [:logger, :inets, :ssl, :crypto, :plug, :cowboy],
+      mod: {LMStudio.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:plug, "~> 1.15"},
+      {:plug_cowboy, "~> 2.6"},
+      {:httpoison, "~> 2.0"},
+      {:websocket_client, "~> 1.5"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 

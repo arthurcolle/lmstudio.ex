@@ -106,7 +106,7 @@ defmodule LiveDemo do
         
         for mutation <- mutations do
           case LMStudio.MetaDSL.SelfModifyingGrid.mutate(grid_pid, mutation) do
-            {:ok, :mutated} ->
+            :ok ->
               IO.puts("  ✅ Applied: #{mutation.type} on '#{mutation.target}'")
             {:error, reason} ->
               IO.puts("  ❌ Failed: #{inspect(reason)}")
